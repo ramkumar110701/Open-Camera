@@ -8,11 +8,12 @@ const CameraCapture = () => {
   const [open, setOpen] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const [cameraLoading, setCameraLoading] = useState(true); 
 
   const checkCameraAccess = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      stream.getTracks().forEach(track => track.stop()); 
+      stream.getTracks().forEach((track) => track.stop());
       setCameraError(null);
     } catch (error) {
       console.error("Camera error:", error);
@@ -20,13 +21,11 @@ const CameraCapture = () => {
     }
   };
 
-  const getVideoConstraints = () => {
-    return {
-      width: { ideal: 1280 },
-      height: { ideal: 720 },
-      facingMode: "environment", 
-    };
-  };
+  const getVideoConstraints = () => ({
+    width: { ideal: 1280 },
+    height: { ideal: 720 },
+    facingMode: "environment",
+  });
 
   useEffect(() => {
     checkCameraAccess();
@@ -67,7 +66,8 @@ const CameraCapture = () => {
     setImage(null);
     setImageFile(null);
     setOpen(true);
-    checkCameraAccess(); 
+    setCameraLoading(true); 
+    checkCameraAccess();
   };
 
   return (
@@ -89,19 +89,28 @@ const CameraCapture = () => {
           {cameraError && <p className="error-message">{cameraError}</p>}
 
           {!image && !cameraError && (
-            <Webcam
-            audio={false}
-            ref={webcamRef}
-            screenshotFormat="image/jpeg"
-            videoConstraints={getVideoConstraints()}
-            onUserMedia={() => setCameraError(null)} 
-            onUserMediaError={(error) => {
-              console.error("Camera access error:", error);
-              setCameraError("Failed to access camera.");
-            }}
-            playsInline
-            className="camera-preview"
-          />
+            <>
+              {cameraLoading && <p className="loading-message">Loading camera...</p>}
+              <Webcam
+                audio={false}
+                ref={webcamRef}
+                screenshotFormat="image/jpeg"
+                videoConstraints={getVideoConstraints()}
+                onUserMedia={() => {
+                  setCameraError(null);
+                  setCameraLoading(false); 
+                }}
+                onUserMediaError={(error) => {
+                  console.error("Camera access error:", error);
+                  setTimeout(() => {
+                    setCameraError("Failed to access camera.");
+                  }, 500); 
+                  setCameraLoading(false);
+                }}
+                playsInline
+                className="camera-preview"
+              />
+            </>
           )}
 
           {image && <img src={image} alt="Captured" className="camera-preview" />}
