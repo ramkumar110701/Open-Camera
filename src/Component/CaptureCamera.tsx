@@ -118,7 +118,6 @@ const CameraCapture = () => {
               </>
             )}
           </div>
-
         </div>
       )}
     </div>
