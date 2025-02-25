@@ -12,7 +12,7 @@ const CameraCapture = () => {
   const checkCameraAccess = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      stream.getTracks().forEach(track => track.stop()); // Close stream after checking access
+      stream.getTracks().forEach(track => track.stop()); 
       setCameraError(null);
     } catch (error) {
       console.error("Camera error:", error);
@@ -24,7 +24,7 @@ const CameraCapture = () => {
     return {
       width: { ideal: 1280 },
       height: { ideal: 720 },
-      facingMode: "environment", // Removed { ideal: "environment" } for better compatibility
+      facingMode: "environment", 
     };
   };
 
@@ -67,7 +67,7 @@ const CameraCapture = () => {
     setImage(null);
     setImageFile(null);
     setOpen(true);
-    checkCameraAccess(); // Ensure camera access when opening
+    checkCameraAccess(); 
   };
 
   return (
