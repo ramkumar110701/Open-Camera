@@ -90,14 +90,18 @@ const CameraCapture = () => {
 
           {!image && !cameraError && (
             <Webcam
-              audio={false}
-              ref={webcamRef}
-              screenshotFormat="image/jpeg"
-              videoConstraints={getVideoConstraints()}
-              onUserMediaError={() => setCameraError("Failed to access camera.")}
-              playsInline
-              className="camera-preview"
-            />
+            audio={false}
+            ref={webcamRef}
+            screenshotFormat="image/jpeg"
+            videoConstraints={getVideoConstraints()}
+            onUserMedia={() => setCameraError(null)} 
+            onUserMediaError={(error) => {
+              console.error("Camera access error:", error);
+              setCameraError("Failed to access camera.");
+            }}
+            playsInline
+            className="camera-preview"
+          />
           )}
 
           {image && <img src={image} alt="Captured" className="camera-preview" />}
