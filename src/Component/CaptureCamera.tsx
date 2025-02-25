@@ -18,6 +18,13 @@ const CameraCapture = () => {
       setCameraError("Camera access denied. Enable it in browser settings.");
     }
   };
+
+  const getVideoConstraints = () => {
+    return navigator.userAgent.match(/Android|iPhone/i)
+      ? { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: { exact: "environment" } } // Back camera on mobile
+      : { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" }; // Front camera on desktop
+  };
+  
   
   useEffect(() => {
     checkCameraAccess();
@@ -78,17 +85,13 @@ const CameraCapture = () => {
         <div className="camera-popup">
           {!image && (
             <Webcam
-              audio={false}
-              ref={webcamRef}
-              screenshotFormat="image/jpeg"
-              videoConstraints={{
-                width: { ideal: 1280 },
-                height: { ideal: 720 },
-                facingMode: { ideal: "environment" },
-              }}
-              playsInline
-              className="camera-preview"
-            />
+            audio={false}
+            ref={webcamRef}
+            screenshotFormat="image/jpeg"
+            videoConstraints={getVideoConstraints()} // Dynamically set constraints
+            playsInline
+            className="camera-preview"
+          />          
           )}
 
           {image && <img src={image} alt="Captured" className="camera-preview" />}
