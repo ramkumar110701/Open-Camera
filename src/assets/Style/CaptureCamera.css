@@ -97,31 +97,32 @@
 }
 
 /* Capture button - Green */
-.action-button:nth-child(1) {
+.capture-button {
   background: linear-gradient(135deg, #28a745, #218838);
 }
 
-.action-button:nth-child(1):hover {
+.capture-button:hover {
   background: linear-gradient(135deg, #218838, #1e7e34);
 }
 
-/* Retake button - Blue */
-.action-button:nth-child(2) {
+/* Retake button - Red */
+.retake-button {
   background: linear-gradient(135deg, #007bff, #0056b3);
 }
 
-.action-button:nth-child(2):hover {
+.retake-button:hover {
   background: linear-gradient(135deg, #0056b3, #003c80);
 }
 
-/* Save button - Green */
-.action-button:nth-child(3) {
+/* Save button - Blue */
+.save-button {
   background: linear-gradient(135deg, #28a745, #218838);
 }
 
-.action-button:nth-child(3):hover {
+.save-button:hover {
   background: linear-gradient(135deg, #218838, #1e7e34);
 }
+
 
 
 

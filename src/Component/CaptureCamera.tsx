@@ -104,20 +104,21 @@ const CameraCapture = () => {
 
           <div className="button-group">
             {!image ? (
-              <button onClick={capture} className="action-button">
-                Capture 
+              <button onClick={capture} className="action-button capture-button">
+                Capture
               </button>
             ) : (
               <>
-                <button onClick={retake} className="action-button">
+                <button onClick={retake} className="action-button retake-button">
                   Retake
                 </button>
-                <button onClick={saveImage} className="action-button">
+                <button onClick={saveImage} className="action-button save-button">
                   Save
                 </button>
               </>
             )}
           </div>
+
         </div>
       )}
     </div>
