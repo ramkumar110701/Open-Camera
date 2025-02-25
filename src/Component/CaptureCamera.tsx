@@ -8,25 +8,26 @@ const CameraCapture = () => {
   const [open, setOpen] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const [isCameraLoading, setIsCameraLoading] = useState(true);
 
   const checkCameraAccess = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      stream.getTracks().forEach(track => track.stop()); 
+      stream.getTracks().forEach(track => track.stop());
       setCameraError(null);
     } catch (error) {
       console.error("Camera error:", error);
       setCameraError("Camera access denied. Enable it in browser settings.");
+    } finally {
+      setIsCameraLoading(false);
     }
   };
 
-  const getVideoConstraints = () => {
-    return {
-      width: { ideal: 1280 },
-      height: { ideal: 720 },
-      facingMode: "environment", 
-    };
-  };
+  const getVideoConstraints = () => ({
+    width: { ideal: 1280 },
+    height: { ideal: 720 },
+    facingMode: "environment",
+  });
 
   useEffect(() => {
     checkCameraAccess();
@@ -67,7 +68,8 @@ const CameraCapture = () => {
     setImage(null);
     setImageFile(null);
     setOpen(true);
-    checkCameraAccess(); 
+    setIsCameraLoading(true);
+    checkCameraAccess();
   };
 
   return (
@@ -86,42 +88,52 @@ const CameraCapture = () => {
 
       {open && (
         <div className="camera-popup">
-          {cameraError && <p className="error-message">{cameraError}</p>}
+          {isCameraLoading ? (
+            <p className="loading-message">Initializing camera...</p>
+          ) : cameraError ? (
+            <p className="error-message">{cameraError}</p>
+          ) : (
+            <>
+              {!image && (
+                <Webcam
+                  audio={false}
+                  ref={webcamRef}
+                  screenshotFormat="image/jpeg"
+                  videoConstraints={getVideoConstraints()}
+                  onUserMedia={() => {
+                    setCameraError(null);
+                    setIsCameraLoading(false);
+                  }}
+                  onUserMediaError={(error) => {
+                    console.error("Camera access error:", error);
+                    setCameraError("Failed to access camera.");
+                    setIsCameraLoading(false);
+                  }}
+                  playsInline
+                  className="camera-preview"
+                />
+              )}
 
-          {!image && !cameraError && (
-            <Webcam
-            audio={false}
-            ref={webcamRef}
-            screenshotFormat="image/jpeg"
-            videoConstraints={getVideoConstraints()}
-            onUserMedia={() => setCameraError(null)} 
-            onUserMediaError={(error) => {
-              console.error("Camera access error:", error);
-              setCameraError("Failed to access camera.");
-            }}
-            playsInline
-            className="camera-preview"
-          />
+              {image && <img src={image} alt="Captured" className="camera-preview" />}
+
+              <div className="button-group">
+                {!image ? (
+                  <button onClick={capture} className="action-button capture-button">
+                    Capture
+                  </button>
+                ) : (
+                  <>
+                    <button onClick={retake} className="action-button retake-button">
+                      Retake
+                    </button>
+                    <button onClick={saveImage} className="action-button save-button">
+                      Save
+                    </button>
+                  </>
+                )}
+              </div>
+            </>
           )}
-
-          {image && <img src={image} alt="Captured" className="camera-preview" />}
-
-          <div className="button-group">
-            {!image ? (
-              <button onClick={capture} className="action-button capture-button">
-                Capture
-              </button>
-            ) : (
-              <>
-                <button onClick={retake} className="action-button retake-button">
-                  Retake
-                </button>
-                <button onClick={saveImage} className="action-button save-button">
-                  Save
-                </button>
-              </>
-            )}
-          </div>
         </div>
       )}
     </div>
