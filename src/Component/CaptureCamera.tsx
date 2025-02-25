@@ -78,7 +78,7 @@ const CameraCapture = () => {
       />
 
       <button onClick={handleOpenCamera} className="camera-button">
-        📷 Camera
+        📷 Camera Button
       </button>
 
       {open && (
