@@ -11,7 +11,8 @@ const CameraCapture = () => {
 
   const checkCameraAccess = async () => {
     try {
-      await navigator.mediaDevices.getUserMedia({ video: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      stream.getTracks().forEach(track => track.stop()); // Close stream after checking access
       setCameraError(null);
     } catch (error) {
       console.error("Camera error:", error);
@@ -20,26 +21,16 @@ const CameraCapture = () => {
   };
 
   const getVideoConstraints = () => {
-    return navigator.userAgent.match(/Android|iPhone/i)
-      ? { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: { ideal: "environment" } } // Fix facingMode for mobile
-      : { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" }; // Front camera on desktop
+    return {
+      width: { ideal: 1280 },
+      height: { ideal: 720 },
+      facingMode: "environment", // Removed { ideal: "environment" } for better compatibility
+    };
   };
 
   useEffect(() => {
     checkCameraAccess();
   }, []);
-
-  const base64ToFile = (base64: string, filename: string) => {
-    const arr = base64.split(",");
-    const mime = arr[0].match(/:(.*?);/)?.[1] || "image/jpeg";
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new File([u8arr], filename, { type: mime });
-  };
 
   const capture = () => {
     const imageSrc = webcamRef.current?.getScreenshot();
@@ -60,10 +51,23 @@ const CameraCapture = () => {
     }
   };
 
+  const base64ToFile = (base64: string, filename: string) => {
+    const arr = base64.split(",");
+    const mime = arr[0].match(/:(.*?);/)?.[1] || "image/jpeg";
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
+  };
+
   const handleOpenCamera = () => {
     setImage(null);
     setImageFile(null);
     setOpen(true);
+    checkCameraAccess(); // Ensure camera access when opening
   };
 
   return (
@@ -101,7 +105,7 @@ const CameraCapture = () => {
           <div className="button-group">
             {!image ? (
               <button onClick={capture} className="action-button">
-                Capture
+                Capture 
               </button>
             ) : (
               <>
