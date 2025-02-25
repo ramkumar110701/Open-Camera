@@ -12,12 +12,13 @@ const CameraCapture = () => {
   const checkCameraAccess = async () => {
     try {
       await navigator.mediaDevices.getUserMedia({ video: true });
-    } catch {
-      setCameraError("Camera access is blocked. Please allow camera permissions in settings.");
+      setCameraError(null);
+    } catch (error) {
+      console.error("Camera error:", error);
+      setCameraError("Camera access denied. Enable it in browser settings.");
     }
   };
   
-
   useEffect(() => {
     checkCameraAccess();
   }, []);
@@ -83,7 +84,7 @@ const CameraCapture = () => {
               videoConstraints={{
                 width: { ideal: 1280 },
                 height: { ideal: 720 },
-                facingMode: "environment", 
+                facingMode: { ideal: "environment" },
               }}
               playsInline
               className="camera-preview"
