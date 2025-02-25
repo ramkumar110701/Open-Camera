@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
-import "../assets/Style/CaptureCamera.css"; 
+import "../assets/Style/CaptureCamera.css";
 
 const CameraCapture = () => {
   const webcamRef = useRef<Webcam | null>(null);
@@ -21,11 +21,10 @@ const CameraCapture = () => {
 
   const getVideoConstraints = () => {
     return navigator.userAgent.match(/Android|iPhone/i)
-      ? { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: { exact: "environment" } } // Back camera on mobile
+      ? { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: { ideal: "environment" } } // Fix facingMode for mobile
       : { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" }; // Front camera on desktop
   };
-  
-  
+
   useEffect(() => {
     checkCameraAccess();
   }, []);
@@ -45,19 +44,19 @@ const CameraCapture = () => {
   const capture = () => {
     const imageSrc = webcamRef.current?.getScreenshot();
     if (imageSrc) {
-      setImage(imageSrc); 
+      setImage(imageSrc);
     }
   };
 
   const retake = () => {
-    setImage(null); 
+    setImage(null);
   };
 
   const saveImage = () => {
     if (image) {
       const file = base64ToFile(image, "captured_image.jpg");
       setImageFile(file);
-      setOpen(false); 
+      setOpen(false);
     }
   };
 
@@ -78,20 +77,23 @@ const CameraCapture = () => {
       />
 
       <button onClick={handleOpenCamera} className="camera-button">
-        📷 Camera Button
+        📷 Camera
       </button>
 
       {open && (
         <div className="camera-popup">
-          {!image && (
+          {cameraError && <p className="error-message">{cameraError}</p>}
+
+          {!image && !cameraError && (
             <Webcam
-            audio={false}
-            ref={webcamRef}
-            screenshotFormat="image/jpeg"
-            videoConstraints={getVideoConstraints()} // Dynamically set constraints
-            playsInline
-            className="camera-preview"
-          />          
+              audio={false}
+              ref={webcamRef}
+              screenshotFormat="image/jpeg"
+              videoConstraints={getVideoConstraints()}
+              onUserMediaError={() => setCameraError("Failed to access camera.")}
+              playsInline
+              className="camera-preview"
+            />
           )}
 
           {image && <img src={image} alt="Captured" className="camera-preview" />}
